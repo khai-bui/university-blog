@@ -1,0 +1,18 @@
+# Backend (Java / Spring Boot / Maven)
+backend/target/
+backend/.idea/
+backend/*.iml
+backend/.classpath
+backend/.project
+backend/.settings/
+
+# Frontend (ReactJS / Vite / Node)
+frontend/node_modules/
+frontend/dist/
+frontend/.vscode/
+
+# Security & Environment variables
+.env
+*.env
+*.log
+.DS_Store
