@@ -67,4 +67,20 @@ public class PostService {
                 .createdAt(post.getCreatedAt())
                 .build();
     }
+
+    // Gemini
+    // Inject AIService into PostService
+    private final AIService aiService;
+
+    @Transactional
+    public PostResponse generateAndSaveSummary(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found with ID: " + postId));
+
+        String summary = aiService.summarizePostContent(post.getContent());
+        post.setAiSummary(summary);
+
+        Post updatedPost = postRepository.save(post);
+        return mapToResponse(updatedPost);
+    }
 }

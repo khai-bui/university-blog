@@ -30,4 +30,11 @@ public class PostController {
         List<PostResponse> posts = postService.getAllPosts();
         return ResponseEntity.ok(posts);
     }
+
+    // Gemini summarize
+    @PostMapping("/{id}/summarize")
+    public ResponseEntity<PostResponse> summarizePost(@PathVariable Long id) {
+        PostResponse response = postService.generateAndSaveSummary(id);
+        return ResponseEntity.ok(response);
+    }
 }
