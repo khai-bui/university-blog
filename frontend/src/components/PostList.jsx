@@ -1,6 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { fetchAllPosts, summarizePost } from '../services/postService';
 
+// Tách chuỗi summary thành các ý riêng, dọn ký hiệu markdown
+const parseSummary = (text) => {
+  if (!text) return [];
+  return text
+    .split('\n')
+    .map((line) =>
+      line
+        .replace(/\*\*/g, '')
+        .replace(/^\s*[-*•]\s*/, '')
+        .trim()
+    )
+    .filter(Boolean);
+};
+
 const PostList = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +41,7 @@ const PostList = () => {
     try {
       setSummarizingId(postId);
       const updatedPost = await summarizePost(postId);
-      
+
       // Update local state with new AI summary
       setPosts((prevPosts) =>
         prevPosts.map((post) => (post.id === postId ? updatedPost : post))
@@ -46,100 +60,126 @@ const PostList = () => {
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem' }}>
       <h2>University Community Posts</h2>
-      
+
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
 
       {posts.length === 0 ? (
         <p>No posts available yet.</p>
       ) : (
-        posts.map((post) => (
-          <article
-            key={post.id}
-            style={{
-              border: '1px solid #e2e8f0',
-              borderRadius: '8px',
-              padding: '1.5rem',
-              marginBottom: '1.5rem',
-              backgroundColor: '#ffffff',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-            }}
-          >
-            <h3 style={{ marginTop: 0, color: '#1a202c' }}>{post.title}</h3>
-            
-            <div style={{ fontSize: '0.875rem', color: '#718096', marginBottom: '1rem' }}>
-              <span>Author: <strong>{post.authorName || 'Anonymous'}</strong></span>
-              {post.createdAt && (
-                <span style={{ marginLeft: '1rem' }}>
-                  Date: {new Date(post.createdAt).toLocaleDateString()}
-                </span>
-              )}
-            </div>
+        posts.map((post) => {
+          const summaryPoints = parseSummary(post.aiSummary);
+          const isSummarizing = summarizingId === post.id;
 
-            <p style={{ color: '#4a5568', lineHeight: '1.6' }}>{post.content}</p>
-
-            {/* Tags */}
-            {post.tags && post.tags.length > 0 && (
-              <div style={{ marginBottom: '1rem' }}>
-                {Array.from(post.tags).map((tag, idx) => (
-                  <span
-                    key={idx}
-                    style={{
-                      display: 'inline-block',
-                      backgroundColor: '#edf2f7',
-                      color: '#4a5568',
-                      borderRadius: '4px',
-                      padding: '0.25rem 0.5rem',
-                      fontSize: '0.75rem',
-                      marginRight: '0.5rem',
-                    }}
-                  >
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* AI Summary Box */}
-            {post.aiSummary && (
-              <div
-                style={{
-                  backgroundColor: '#f0fdf4',
-                  borderLeft: '4px solid #22c55e',
-                  padding: '1rem',
-                  borderRadius: '4px',
-                  marginBottom: '1rem',
-                }}
-              >
-                <strong style={{ color: '#15803d', display: 'block', marginBottom: '0.5rem' }}>
-                  🤖 AI Summary:
-                </strong>
-                <p style={{ margin: 0, color: '#166534', fontSize: '0.95rem' }}>
-                  {post.aiSummary}
-                </p>
-              </div>
-            )}
-
-            {/* Summarize Action Button */}
-            <button
-              onClick={() => handleSummarize(post.id)}
-              disabled={summarizingId === post.id}
+          return (
+            <article
+              key={post.id}
               style={{
-                backgroundColor: summarizingId === post.id ? '#cbd5e1' : '#3b82f6',
-                color: '#ffffff',
-                border: 'none',
-                borderRadius: '6px',
-                padding: '0.5rem 1rem',
-                cursor: summarizingId === post.id ? 'not-allowed' : 'pointer',
-                fontWeight: '500',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
+                padding: '1.5rem',
+                marginBottom: '1.5rem',
+                backgroundColor: '#ffffff',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
               }}
             >
-              {summarizingId === post.id ? 'Generating Summary...' : 'Summarize with AI ✨'}
-            </button>
-          </article>
-        ))
+              <h3 style={{ marginTop: 0, color: '#1a202c' }}>{post.title}</h3>
+
+              <div style={{ fontSize: '0.875rem', color: '#718096', marginBottom: '1rem' }}>
+                <span>
+                  Author: <strong>{post.authorName || 'Anonymous'}</strong>
+                </span>
+                {post.createdAt && (
+                  <span style={{ marginLeft: '1rem' }}>
+                    Date: {new Date(post.createdAt).toLocaleDateString()}
+                  </span>
+                )}
+              </div>
+
+              <p style={{ color: '#4a5568', lineHeight: '1.6', whiteSpace: 'pre-line' }}>
+                {post.content}
+              </p>
+
+              {/* Tags */}
+              {post.tags && post.tags.length > 0 && (
+                <div style={{ marginBottom: '1rem' }}>
+                  {Array.from(post.tags).map((tag, idx) => (
+                    <span
+                      key={idx}
+                      style={{
+                        display: 'inline-block',
+                        backgroundColor: '#edf2f7',
+                        color: '#4a5568',
+                        borderRadius: '4px',
+                        padding: '0.25rem 0.5rem',
+                        fontSize: '0.75rem',
+                        marginRight: '0.5rem',
+                      }}
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* AI Summary Box */}
+              {summaryPoints.length > 0 && (
+                <div
+                  style={{
+                    backgroundColor: '#f0fdf4',
+                    borderLeft: '4px solid #22c55e',
+                    padding: '1rem 1.25rem',
+                    borderRadius: '4px',
+                    marginBottom: '1rem',
+                  }}
+                >
+                  <strong style={{ color: '#15803d', display: 'block', marginBottom: '0.5rem' }}>
+                    🤖 AI Summary
+                  </strong>
+                  <ul
+                    style={{
+                      margin: 0,
+                      paddingLeft: '1.25rem',
+                      color: '#166534',
+                      fontSize: '0.95rem',
+                      lineHeight: '1.6',
+                      textAlign: 'left',
+                    }}
+                  >
+                    {summaryPoints.map((point, idx) => (
+                      <li key={idx} style={{ marginBottom: '0.35rem' }}>
+                        {point}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Summarize Action Button */}
+              <button
+                onClick={() => handleSummarize(post.id)}
+                disabled={isSummarizing}
+                style={{
+                  backgroundColor: isSummarizing ? '#cbd5e1' : '#3b82f6',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '0.5rem 1rem',
+                  cursor: isSummarizing ? 'not-allowed' : 'pointer',
+                  fontWeight: '500',
+                }}
+              >
+                {isSummarizing
+                  ? 'Generating Summary...'
+                  : post.aiSummary
+                  ? 'Regenerate Summary ✨'
+                  : 'Summarize with AI ✨'}
+              </button>
+            </article>
+          );
+        })
       )}
     </div>
   );
 };
 
-export default PostList;
+export default PostList;  
