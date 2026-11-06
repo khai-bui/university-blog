@@ -1,12 +1,16 @@
 package com.khai.buiminh05.university_blog.service;
 
+import com.khai.buiminh05.university_blog.controller.UserController;
 import com.khai.buiminh05.university_blog.dto.CreateUserRequest;
 import com.khai.buiminh05.university_blog.dto.UserResponse;
 import com.khai.buiminh05.university_blog.entity.User;
 import com.khai.buiminh05.university_blog.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -15,7 +19,26 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    // Student
+    @Transactional
+    public User registerUser(UserController.RegisterRequest request) {
+        if (userRepository.existsByUsername(request.username())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken");
+        }
+        if (userRepository.existsByEmail(request.email())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
+        }
+        User user = User.builder()
+                .username(request.username())
+                .email(request.email())
+                .password(passwordEncoder.encode(request.password()))
+                .role(User.Role.ROLE_STUDENT)
+                .build();
+        return userRepository.save(user);
+    }
 
+    // Admin
     @Transactional
     public UserResponse createUser(CreateUserRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {

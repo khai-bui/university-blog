@@ -9,6 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+
 import java.util.List;
 
 @RestController
@@ -18,6 +23,18 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+
+
+    public record RegisterRequest(
+            @NotBlank @Size(min = 3, max = 30) String username,
+            @NotBlank @Email String email,
+            @NotBlank @Size(min = 6) String password) {}
+
+    public record LoginRequest(
+            @NotBlank String username,
+            @NotBlank String password) {}
+
+    public record AuthResponse(String token, String username, String role) {}
 
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
