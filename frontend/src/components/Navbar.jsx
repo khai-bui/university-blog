@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import logo from '../assets/university.png';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -13,7 +14,9 @@ const Navbar = () => {
   return (
     <header className="site-nav">
       <Link to="/" className="brand">
-        <span className="brand-mark">UB</span>
+        <span className="brand-mark">
+          <img src={logo} alt="University Blog" />
+        </span>
         <span>University<br />Blog</span>
       </Link>
 

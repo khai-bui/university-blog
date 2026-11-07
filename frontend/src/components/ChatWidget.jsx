@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useMatch } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { sendChat } from '../services/chatService';
+import chatIcon from '../assets/chatbot.png';
+
 
 const DETAIL_SUGGESTIONS = ['Tóm tắt bài viết này', 'Nêu các ý chính', 'Có mốc thời gian hay hạn chót nào không?'];
 const HOME_SUGGESTIONS = ['Có cuộc thi nào sắp diễn ra?', 'Bài viết về thực tập', 'Thông báo mới nhất'];
@@ -129,7 +131,7 @@ const ChatWidget = () => {
       )}
 
       <button className="chat-fab" onClick={() => setOpen(!open)} aria-label="Mở chatbot">
-        {open ? '✕' : '💬'}
+        {open ? '✕' : <img src={chatIcon} alt="" />}
       </button>
     </>
   );

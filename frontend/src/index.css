@@ -47,15 +47,16 @@ button { font-family: inherit; cursor: pointer; }
   letter-spacing: 0.03em;
 }
 .brand-mark {
-  width: 34px;
-  height: 38px;
-  background: #fff;
-  color: var(--red);
-  border-radius: 4px 4px 18px 18px;
+  width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
-  font-weight: 800;
-  font-size: 0.8rem;
+}
+.brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 .nav-actions { display: flex; align-items: center; gap: 20px; font-size: 0.95rem; }
 .nav-actions a { color: #fff; text-decoration: none; font-weight: 500; }
@@ -381,17 +382,30 @@ a.link-btn:hover { text-decoration: underline; }
   position: fixed;
   right: 24px;
   bottom: 24px;
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
+  padding: 0;
   border-radius: 50%;
-  border: none;
-  background: var(--red);
-  color: #fff;
-  font-size: 1.5rem;
+  border: 2px solid var(--black);
+  background: #fff;
+  color: var(--red);
+  font-size: 1.4rem;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
   z-index: 1000;
 }
 .chat-fab:hover { transform: scale(1.06); }
+
+.chat-fab img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 0;
+  display: block;
+  transform: scale(1.5);
+}
 
 .chat-panel {
   position: fixed;
