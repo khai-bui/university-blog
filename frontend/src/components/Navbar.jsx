@@ -11,16 +11,17 @@ const Navbar = () => {
   };
 
   return (
-    <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  padding: '0.75rem 1.5rem', borderBottom: '1px solid #e2e8f0' }}>
-      <Link to="/" style={{ fontWeight: 700, textDecoration: 'none', color: '#1a202c' }}>
-        University Blog
+    <header className="site-nav">
+      <Link to="/" className="brand">
+        <span className="brand-mark">UB</span>
+        <span>University<br />Blog</span>
       </Link>
-      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+
+      <nav className="nav-actions">
         {user ? (
           <>
             <span>Xin chào, <strong>{user.username}</strong></span>
-            <button onClick={handleLogout}>Đăng xuất</button>
+            <button className="nav-btn" onClick={handleLogout}>Đăng xuất</button>
           </>
         ) : (
           <>
@@ -28,8 +29,8 @@ const Navbar = () => {
             <Link to="/register">Đăng ký</Link>
           </>
         )}
-      </div>
-    </nav>
+      </nav>
+    </header>
   );
 };
 
