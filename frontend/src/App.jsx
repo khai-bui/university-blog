@@ -3,8 +3,8 @@ import Navbar from './components/Navbar';
 import PostList from './components/PostList';
 import PostDetail from './components/PostDetail';
 import ChatWidget from './components/ChatWidget';
-import Login from './components/Login';
-import Register from './components/Register';
+  import Login from "./pages/Login";
+  import Register from "./pages/Register";
 
 function App() {
   return (

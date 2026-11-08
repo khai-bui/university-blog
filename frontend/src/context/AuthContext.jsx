@@ -17,12 +17,17 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (username, password) => {
-    const res = await api.post('/auth/login', { username, password });
+    const res = await api.post('/api/auth/login', { username, password });
     saveAuth(res.data);
   };
 
   const register = async (username, email, password) => {
-    const res = await api.post('/auth/register', { username, email, password });
+    const res = await api.post('/api/auth/register', { username, email, password });
+    saveAuth(res.data);
+  };
+
+  const socialLogin = async (provider, token) => {
+    const res = await api.post(`/api/auth/${provider}`, { token });
     saveAuth(res.data);
   };
 
@@ -33,7 +38,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider
+      value={{ user, isAuthenticated: !!user, login, register, socialLogin, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

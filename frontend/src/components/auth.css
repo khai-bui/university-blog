@@ -1,0 +1,118 @@
+/* Đổi 4 biến này cho khớp navbar của bạn */
+:root {
+  --brand: #0b2a5b;          /* màu navy chính của navbar/hero */
+  --brand-dark: #071d42;
+  --accent: #2f6fed;         /* màu nút, link */
+  --navbar-height: 64px;     /* chiều cao navbar thật */
+}
+
+.auth-page {
+  min-height: calc(100vh - var(--navbar-height));
+  display: grid;
+  place-items: center;
+  padding: 32px 16px;
+  background: #f3f5f9;
+}
+
+.auth-card {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  width: 100%;
+  max-width: 960px;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(11, 42, 91, 0.15);
+}
+
+.auth-side {
+  background: linear-gradient(160deg, var(--brand), var(--brand-dark));
+  color: #fff;
+  padding: 48px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.auth-side h2 { margin: 0 0 12px; font-size: 1.6rem; line-height: 1.25; }
+.auth-side p { margin: 0 0 20px; opacity: 0.85; line-height: 1.6; }
+.auth-side ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.auth-side li::before { content: "✓"; margin-right: 10px; color: #7fb0ff; font-weight: 700; }
+
+.auth-main { padding: 44px 40px; }
+.auth-main h1 { margin: 0 0 6px; font-size: 1.7rem; color: var(--brand); }
+.auth-subtitle { margin: 0 0 24px; color: #5b6475; }
+
+.auth-form { display: grid; gap: 16px; }
+.field { display: grid; gap: 6px; }
+.field > span { font-size: 0.875rem; font-weight: 600; color: #2b3445; }
+.field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid #cfd6e3;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.field input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.18);
+}
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.field-password { position: relative; }
+.field-password input { padding-right: 64px; }
+.field-password button {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  background: none; border: 0; color: var(--accent);
+  font-weight: 600; cursor: pointer; padding: 6px 8px;
+}
+
+.check { display: flex; gap: 10px; align-items: flex-start; font-size: 0.875rem; color: #4a5468; }
+.check input { margin-top: 3px; }
+
+.auth-error {
+  background: #fdecec; color: #b42318;
+  border: 1px solid #f5c2c0; border-radius: 8px;
+  padding: 10px 12px; font-size: 0.9rem;
+}
+
+.auth-submit {
+  padding: 13px; border: 0; border-radius: 8px;
+  background: var(--brand); color: #fff;
+  font-size: 1rem; font-weight: 700; cursor: pointer;
+  transition: background 0.15s;
+}
+.auth-submit:hover:not(:disabled) { background: var(--brand-dark); }
+.auth-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.auth-footer { margin: 22px 0 0; text-align: center; color: #5b6475; font-size: 0.9rem; }
+.auth-footer a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.auth-footer a:hover { text-decoration: underline; }
+
+@media (max-width: 800px) {
+  .auth-card { grid-template-columns: 1fr; }
+  .auth-side { display: none; }
+  .auth-main { padding: 32px 22px; }
+}
+
+.social { display: grid; gap: 12px; margin-bottom: 4px; }
+.social-google { display: flex; justify-content: center; }
+
+.social { display: grid; gap: 12px; margin-bottom: 4px; }
+.social-google { display: flex; justify-content: center; }
+.auth-divider { display: flex; align-items: center; gap: 12px; color: #8a93a5; font-size: 0.85rem; margin-top: 6px; }
+.auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: #dde2ec; }
+
+.social-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; box-sizing: border-box;
+  padding: 12px; border-radius: 8px; background: #fff;
+  font-size: 1rem; font-weight: 600; cursor: pointer;
+  transition: background 0.15s;
+}
+.social-btn.google { border: 1px solid #111; color: #111; }
+.social-btn.google:hover { background: #f5f5f5; }
+
+.social-note { margin: 2px 0 0; text-align: center; font-size: 0.8rem; color: #5b6475; line-height: 1.5; }
