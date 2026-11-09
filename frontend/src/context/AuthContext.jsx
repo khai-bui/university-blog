@@ -17,17 +17,27 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (username, password) => {
-    const res = await api.post('/api/auth/login', { username, password });
+    const res = await api.post('/auth/login', { username, password });
     saveAuth(res.data);
   };
 
+  // Đăng ký xong chưa đăng nhập, phải xác minh email bằng OTP trước
   const register = async (username, email, password) => {
-    const res = await api.post('/api/auth/register', { username, email, password });
+    const res = await api.post('/auth/register', { username, email, password });
+    return res.data;
+  };
+
+  const verifyOtp = async (email, code) => {
+    const res = await api.post('/auth/verify-otp', { email, code });
     saveAuth(res.data);
+  };
+
+  const resendOtp = async (email) => {
+    await api.post('/auth/resend-otp', { email });
   };
 
   const socialLogin = async (provider, token) => {
-    const res = await api.post(`/api/auth/${provider}`, { token });
+    const res = await api.post(`/auth/${provider}`, { token });
     saveAuth(res.data);
   };
 
@@ -39,7 +49,16 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated: !!user, login, register, socialLogin, logout }}
+      value={{
+        user,
+        isAuthenticated: !!user,
+        login,
+        register,
+        verifyOtp,
+        resendOtp,
+        socialLogin,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

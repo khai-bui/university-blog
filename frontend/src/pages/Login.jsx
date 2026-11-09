@@ -22,8 +22,13 @@ export default function Login() {
     try {
       await login(form.username.trim(), form.password);
       navigate("/");
-    } catch (err) {
-      setError(getErrorMessage(err));
+    }  catch (err) {
+    const data = err.response?.data;
+    if (data?.code === "EMAIL_NOT_VERIFIED") {
+      navigate("/verify", { state: { email: data.email, autoSend: true } });
+      return;
+    }
+    setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }

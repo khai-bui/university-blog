@@ -52,6 +52,7 @@ export default function SocialLogin({ note }) {
       await socialLogin(provider, token);
       navigate("/");
     } catch (err) {
+      console.error("Social login error:", err); 
       setError(getErrorMessage(err));
     }
   };

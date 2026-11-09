@@ -30,7 +30,8 @@ export default function Register() {
     setLoading(true);
     try {
       await register(form.username.trim(), form.email.trim(), form.password);
-      navigate("/");
+      // Verify OTP will be handled in the next step, so we navigate to the verification page
+      navigate("/verify", { state: { email: form.email.trim() } });
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {
