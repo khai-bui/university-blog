@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { getAdminPosts, approvePost, rejectPost } from "../../services/adminService";
 import { getErrorMessage } from "../../utils/getErrorMessage";
+import { getImageUrl } from "../../utils/getImageUrl";
+import PostContent from "../../components/PostContent";
 import "../ui.css";
 
 const TABS = [
@@ -61,9 +63,12 @@ export default function AdminPosts() {
             <h3>{p.title}</h3>
             <span className="muted">by {p.authorName ?? "unknown"}</span>
           </div>
-          <p className="content">
-            {open === p.id ? p.content : p.content.slice(0, 300) + (p.content.length > 300 ? "..." : "")}
-          </p>
+          {p.imageUrl && (
+            <img className="review-image" src={getImageUrl(p.imageUrl)} alt={p.imageAlt || p.title} />
+          )}
+          <div className="content">
+            {open === p.id ? <PostContent content={p.content} /> : p.content.replace(/<[^>]*>/g, " ").slice(0, 300)}
+          </div>
           {p.content.length > 300 && (
             <button className="link" onClick={() => setOpen(open === p.id ? null : p.id)}>
               {open === p.id ? "Collapse" : "Read more"}

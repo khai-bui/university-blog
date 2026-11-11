@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { fetchPostById } from '../services/postService';
+import { getImageUrl } from '../utils/getImageUrl';
+import PostContent from './PostContent';
 
 const formatDate = (value) =>
   value
@@ -42,7 +44,6 @@ const PostDetail = () => {
   }
 
   const content = post.content || '';
-  const paragraphs = content.split(/\n+/).filter((p) => p.trim());
   const words = content.trim().split(/\s+/).filter(Boolean).length;
   const readMinutes = Math.max(1, Math.ceil(words / 180));
   const lead = content.length > 180 ? content.slice(0, 180).trim() + '...' : content;
@@ -95,6 +96,12 @@ const PostDetail = () => {
         <p className="readtime">Reading time: {readMinutes} minute{readMinutes > 1 ? 's' : ''}</p>
       </section>
 
+      {post.imageUrl && (
+        <div className="article-image-wrap">
+          <img className="article-image" src={getImageUrl(post.imageUrl)} alt={post.imageAlt || post.title} />
+        </div>
+      )}
+
       <div className="article-wrap">
         <div className="share-rail">
           <a
@@ -119,9 +126,7 @@ const PostDetail = () => {
         </div>
 
         <article className="article-body">
-          {paragraphs.map((p, i) => (
-            <p key={i}>{p}</p>
-          ))}
+          <PostContent content={content} />
 
           {tags.length > 0 && (
             <div className="tags">

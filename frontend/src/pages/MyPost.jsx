@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { getMyPosts } from "../services/submissionService";
 import { getErrorMessage } from "../utils/getErrorMessage";
+import { getImageUrl } from "../utils/getImageUrl";
 import "./ui.css";
 
 const LABEL = { PENDING: "Pending", APPROVED: "Published", REJECTED: "Rejected" };
@@ -37,6 +38,9 @@ export default function MyPosts() {
             <h3>{p.title}</h3>
             <span className={`badge ${p.status.toLowerCase()}`}>{LABEL[p.status]}</span>
           </div>
+          {p.imageUrl && (
+            <img className="post-thumbnail" src={getImageUrl(p.imageUrl)} alt={p.imageAlt || p.title} />
+          )}
           {p.status === "REJECTED" && p.rejectReason && (
             <p className="muted">Reason: {p.rejectReason}</p>
           )}

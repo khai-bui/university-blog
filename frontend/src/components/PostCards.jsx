@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { getImageUrl } from '../utils/getImageUrl';
 
 const PALETTES = [
   ['#ff7a59', '#7b2ff7'],
@@ -24,7 +25,7 @@ const ChatIcon = () => (
 
 const PostCard = ({ post }) => {
   const tags = Array.from(post.tags || []);
-  const content = post.content || '';
+  const content = (post.content || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
   const detailUrl = `/posts/${post.id}`;
 
   const [c1, c2] = PALETTES[hash(post.title || String(post.id)) % PALETTES.length];
@@ -34,7 +35,7 @@ const PostCard = ({ post }) => {
     <article className="card">
       <Link to={detailUrl} className="card-cover">
         {post.imageUrl ? (
-          <img src={post.imageUrl} alt={post.title} />
+          <img src={getImageUrl(post.imageUrl)} alt={post.imageAlt || post.title} />
         ) : (
           <div className="cover-fallback" style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }}>
             {letter}
