@@ -1,0 +1,42 @@
+.page { max-width: 900px; margin: 0 auto; padding: 32px 16px; }
+.page h1 { color: var(--brand, #0b2a5b); margin: 0 0 8px; }
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.muted { color: #5b6475; }
+
+.card { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(11, 42, 91, 0.08); padding: 20px; margin-top: 16px; }
+.form { display: grid; gap: 16px; }
+.form label { display: grid; gap: 6px; font-weight: 600; color: #2b3445; }
+.form input, .form textarea, .search, select {
+  padding: 10px 12px; border: 1px solid #cfd6e3; border-radius: 8px; font: inherit; width: 100%; box-sizing: border-box;
+}
+select { width: auto; }
+.search { margin-top: 12px; }
+.content { white-space: pre-wrap; line-height: 1.6; }
+
+.btn { padding: 10px 18px; border: 0; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
+.btn.primary { background: var(--brand, #0b2a5b); color: #fff; }
+.btn.danger { background: #fdecec; color: #b42318; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.link { background: none; border: 0; color: var(--accent, #2f6fed); font-weight: 600; cursor: pointer; padding: 0; }
+.actions { display: flex; gap: 10px; margin-top: 12px; }
+
+.item-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.item-head h3 { margin: 0; }
+
+.tabs { display: flex; gap: 8px; margin: 16px 0 4px; }
+.tab { padding: 8px 16px; border: 1px solid #cfd6e3; border-radius: 999px; background: #fff; cursor: pointer; font-weight: 600; }
+.tab.active { background: var(--brand, #0b2a5b); color: #fff; border-color: transparent; }
+
+.badge { padding: 4px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; }
+.badge.pending { background: #fff4d6; color: #8a5a00; }
+.badge.approved { background: #dcf5e4; color: #11693a; }
+.badge.rejected { background: #fdecec; color: #b42318; }
+.badge.admin { background: #e4ebff; color: #1d3a8a; }
+
+.alert { padding: 10px 12px; border-radius: 8px; margin-top: 12px; font-size: 0.9rem; }
+.alert.error { background: #fdecec; color: #b42318; border: 1px solid #f5c2c0; }
+.alert.info { background: #eef4ff; color: #1d4ed8; border: 1px solid #c7d9ff; }
+
+.table-wrap { overflow-x: auto; padding: 8px 12px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid #eef1f6; }

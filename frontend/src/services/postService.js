@@ -20,7 +20,7 @@ export const fetchPostById = async (id) => {
     const res = await apiClient.get(`/posts/${id}`);
     return res.data;
   } catch (err) {
-    // Dự phòng khi backend chưa có GET /posts/{id}
+    // Fallback for backends that do not yet support GET /posts/{id}.
     const all = await fetchAllPosts();
     const found = all.find((p) => String(p.id) === String(id));
     if (!found) throw err;

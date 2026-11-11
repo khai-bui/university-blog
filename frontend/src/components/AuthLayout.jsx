@@ -5,12 +5,12 @@ export default function AuthLayout({ title, subtitle, children, footer }) {
     <div className="auth-page">
       <div className="auth-card">
         <aside className="auth-side">
-          <h2>Cộng đồng blog sinh viên</h2>
-          <p>Chia sẻ kinh nghiệm học tập, đọc bài viết từ các bạn và nhận tóm tắt thông minh bằng AI.</p>
+          <h2>Student blog community</h2>
+          <p>Share learning experiences, read posts from your peers, and get AI-powered summaries.</p>
           <ul>
-            <li>Lưu những bài viết yêu thích</li>
-            <li>Đọc nhanh với tóm tắt AI</li>
-            <li>Hỏi chatbot để tìm đúng bài cần đọc</li>
+            <li>Save your favorite posts</li>
+            <li>Read faster with AI summaries</li>
+            <li>Ask the chatbot to find the right post</li>
           </ul>
         </aside>
 

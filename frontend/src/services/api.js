@@ -9,15 +9,15 @@ const apiClient = axios.create({
   },
 });
 
-// Tự gắn token vào mọi request
+// Attach the token to every request automatically.
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// Hết hạn token (401) thì xóa phiên và về trang đăng nhập,
-// trừ các request đăng nhập/đăng ký để form còn hiện được lỗi
+// If the token is expired (401), clear the session and redirect to login,
+// except for login/register requests so forms can still display errors.
 apiClient.interceptors.response.use(
   (res) => res,
   (error) => {

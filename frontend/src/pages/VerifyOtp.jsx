@@ -30,15 +30,15 @@ export default function VerifyOtp() {
     setInfo("");
     try {
       await resendOtp(email);
-      setInfo("Đã gửi mã mới, hãy kiểm tra email của bạn");
+      setInfo("A new code has been sent. Please check your email.");
       setSeconds(COOLDOWN);
     } catch (err) {
-      console.error("Verify error:", err);  
+      console.error("Verify error:", err);
       setError(getErrorMessage(err));
     }
   };
 
-  // Đăng nhập khi chưa xác minh: tự gửi mã một lần
+  // If the user is not yet verified, send the code automatically once.
   useEffect(() => {
     if (state?.autoSend && !autoSent.current) {
       autoSent.current = true;
@@ -52,13 +52,13 @@ export default function VerifyOtp() {
     e.preventDefault();
     setError("");
     setInfo("");
-    if (code.length !== 6) return setError("Vui lòng nhập đủ 6 số");
+    if (code.length !== 6) return setError("Please enter all 6 digits");
     setLoading(true);
     try {
       await verifyOtp(email, code);
       navigate("/");
     } catch (err) {
-      console.error("Verify error:", err);  
+      console.error("Verify error:", err);
       setError(getErrorMessage(err));
     } finally {
       setLoading(false);
@@ -67,13 +67,13 @@ export default function VerifyOtp() {
 
   return (
     <AuthLayout
-      title="Xác minh email"
-      subtitle={`Chúng tôi đã gửi mã 6 số tới ${email}. Mã có hiệu lực trong 5 phút.`}
-      footer={<><Link to="/login">Quay lại đăng nhập</Link></>}
+      title="Verify email"
+      subtitle={`We sent a 6-digit code to ${email}. The code is valid for 5 minutes.`}
+      footer={<><Link to="/login">Back to login</Link></>}
     >
       <form onSubmit={onSubmit} className="auth-form">
         <label className="field">
-          <span>Mã xác minh</span>
+          <span>Verification code</span>
           <input
             className="otp-input"
             inputMode="numeric"
@@ -88,12 +88,12 @@ export default function VerifyOtp() {
         {info && <div className="auth-info">{info}</div>}
         {error && <div className="auth-error" role="alert">{error}</div>}
         <button className="auth-submit" disabled={loading}>
-          {loading ? "Đang xác minh..." : "Xác minh"}
+          {loading ? "Verifying..." : "Verify"}
         </button>
         <p className="auth-footer" style={{ margin: 0 }}>
-          Chưa nhận được mã?{" "}
+          Didn't receive the code?{" "}
           <button type="button" className="otp-resend" onClick={resend} disabled={seconds > 0}>
-            {seconds > 0 ? `Gửi lại sau ${seconds}s` : "Gửi lại mã"}
+            {seconds > 0 ? `Resend in ${seconds}s` : "Resend code"}
           </button>
         </p>
       </form>

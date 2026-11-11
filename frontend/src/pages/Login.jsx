@@ -22,13 +22,13 @@ export default function Login() {
     try {
       await login(form.username.trim(), form.password);
       navigate("/");
-    }  catch (err) {
-    const data = err.response?.data;
-    if (data?.code === "EMAIL_NOT_VERIFIED") {
-      navigate("/verify", { state: { email: data.email, autoSend: true } });
-      return;
-    }
-    setError(getErrorMessage(err));
+    } catch (err) {
+      const data = err.response?.data;
+      if (data?.code === "EMAIL_NOT_VERIFIED") {
+        navigate("/verify", { state: { email: data.email, autoSend: true } });
+        return;
+      }
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -36,22 +36,22 @@ export default function Login() {
 
   return (
     <AuthLayout
-      title="Chào mừng trở lại"
-      subtitle="Đăng nhập để tiếp tục đọc và chia sẻ bài viết."
-      footer={<>Chưa có tài khoản? <Link to="/register">Đăng ký miễn phí</Link></>}
+      title="Welcome back"
+      subtitle="Log in to continue reading and sharing posts."
+      footer={<>Don't have an account? <Link to="/register">Register for free</Link></>}
     >
       <SocialLogin />
       <form onSubmit={onSubmit} className="auth-form">
         <label className="field">
-          <span>Tên đăng nhập</span>
-          <input name="username" placeholder="Nhập tên đăng nhập"
+          <span>Username</span>
+          <input name="username" placeholder="Enter your username"
                  value={form.username} onChange={onChange} required autoComplete="username" />
         </label>
-        <PasswordField label="Mật khẩu" name="password" placeholder="Nhập mật khẩu"
+        <PasswordField label="Password" name="password" placeholder="Enter your password"
                        value={form.password} onChange={onChange} required autoComplete="current-password" />
         {error && <div className="auth-error" role="alert">{error}</div>}
         <button className="auth-submit" disabled={loading}>
-          {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+          {loading ? "Logging in..." : "Log in"}
         </button>
       </form>
     </AuthLayout>

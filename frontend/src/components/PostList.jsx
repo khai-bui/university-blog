@@ -31,7 +31,7 @@ const PostList = () => {
         setLoading(true);
         setPosts(await fetchAllPosts());
       } catch {
-        setErrorMessage('Không tải được bài viết. Kiểm tra xem backend đã chạy chưa.');
+        setErrorMessage('Unable to load posts. Please check whether the backend is running.');
       } finally {
         setLoading(false);
       }
@@ -45,7 +45,7 @@ const PostList = () => {
       const updated = await summarizePost(postId);
       setPosts((prev) => prev.map((p) => (p.id === postId ? updated : p)));
     } catch {
-      alert('Tóm tắt thất bại. Vui lòng thử lại.');
+      alert('Summary failed. Please try again.');
     } finally {
       setSummarizingId(null);
     }
@@ -79,28 +79,28 @@ const PostList = () => {
           <path d="M500 330 C 560 400, 700 420, 820 440" fill="none" stroke="#ff2a2a" strokeWidth="3" />
         </svg>
         <h1>University Blog</h1>
-        <p>Chia sẻ trải nghiệm, kiến thức và thông báo từ cộng đồng sinh viên.</p>
+        <p>Share experiences, knowledge, and updates from the student community.</p>
       </section>
 
       <div className="crumbs">
-        <a href="/">Trang chủ</a>
+        <a href="/">Home</a>
         <span className="sep">▸</span>
-        <em>Bài viết</em>
+        <em>Posts</em>
       </div>
 
       <main className="container">
         <div className="toolbar">
-          <h2>{filtered.length} kết quả</h2>
+          <h2>{filtered.length} results</h2>
 
           <div className="toolbar-right">
             <form className="search" onSubmit={(e) => e.preventDefault()}>
               <input
                 type="text"
-                placeholder="Tìm bài viết, ví dụ: hackathon"
+                placeholder="Search posts, e.g. hackathon"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
-              <button type="submit" aria-label="Tìm kiếm">
+              <button type="submit" aria-label="Search">
                 <SearchIcon />
               </button>
             </form>
@@ -109,15 +109,15 @@ const PostList = () => {
               className={`filter-btn ${showFilters ? 'open' : ''}`}
               onClick={() => setShowFilters(!showFilters)}
             >
-              <FilterIcon /> Lọc bài viết
+              <FilterIcon /> Filter posts
             </button>
           </div>
         </div>
 
         {showFilters && (
           <div className="filter-panel">
-            <span className="label">Thẻ:</span>
-            {allTags.length === 0 && <span>Chưa có thẻ nào.</span>}
+            <span className="label">Tags:</span>
+            {allTags.length === 0 && <span>No tags yet.</span>}
             {allTags.map((tag) => (
               <button
                 key={tag}
@@ -129,16 +129,16 @@ const PostList = () => {
             ))}
             {activeTag && (
               <button className="chip-clear" onClick={() => setActiveTag(null)}>
-                Xóa bộ lọc
+                Clear filter
               </button>
             )}
           </div>
         )}
 
-        {loading && <p className="state-msg">Đang tải bài viết...</p>}
+        {loading && <p className="state-msg">Loading posts...</p>}
         {errorMessage && <p className="state-msg error-msg">{errorMessage}</p>}
         {!loading && !errorMessage && filtered.length === 0 && (
-          <p className="state-msg">Không có bài viết nào phù hợp.</p>
+          <p className="state-msg">No posts match your search.</p>
         )}
 
         <div className="grid">

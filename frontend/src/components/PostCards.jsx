@@ -13,7 +13,7 @@ const hash = (s) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7)
 
 const formatDate = (value) =>
   value
-    ? new Date(value).toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })
+    ? new Date(value).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })
     : '';
 
 const ChatIcon = () => (
@@ -47,12 +47,12 @@ const PostCard = ({ post }) => {
       </h3>
 
       <p className="card-text clamped">{content}</p>
-      <Link to={detailUrl} className="link-btn">Đọc tiếp →</Link>
+      <Link to={detailUrl} className="link-btn">Read more →</Link>
 
       <div className="card-meta">
         <ChatIcon />
         <span>
-          {post.authorName || 'Ẩn danh'}
+          {post.authorName || 'Anonymous'}
           {post.createdAt && ` — ${formatDate(post.createdAt)}`}
         </span>
       </div>

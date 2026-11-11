@@ -4,9 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { sendChat } from '../services/chatService';
 import chatIcon from '../assets/chatbot.png';
 
-
-const DETAIL_SUGGESTIONS = ['Tóm tắt bài viết này', 'Nêu các ý chính', 'Có mốc thời gian hay hạn chót nào không?'];
-const HOME_SUGGESTIONS = ['Có cuộc thi nào sắp diễn ra?', 'Bài viết về thực tập', 'Thông báo mới nhất'];
+const DETAIL_SUGGESTIONS = ['Summarize this post', 'List the main ideas', 'Are there any deadlines or milestones?'];
+const HOME_SUGGESTIONS = ['Any upcoming competitions?', 'Posts about internships', 'Latest announcements'];
 
 const ChatWidget = () => {
   const { user } = useAuth();
@@ -22,7 +21,7 @@ const ChatWidget = () => {
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef(null);
 
-  // Đổi trang/bài thì bắt đầu cuộc trò chuyện mới
+  // Start a new conversation whenever the page or post changes.
   useEffect(() => {
     setMessages([]);
   }, [postId]);
@@ -49,7 +48,7 @@ const ChatWidget = () => {
       const data = await sendChat({ message, postId, history });
       setMessages((prev) => [...prev, { role: 'assistant', text: data.reply, posts: data.posts || [] }]);
     } catch (err) {
-      const msg = err.response?.data?.message || 'Chatbot đang bận, bạn thử lại sau nhé.';
+      const msg = err.response?.data?.message || 'The chatbot is busy. Please try again later.';
       setMessages((prev) => [...prev, { role: 'assistant', text: msg, posts: [] }]);
     } finally {
       setLoading(false);
@@ -67,18 +66,18 @@ const ChatWidget = () => {
         <div className="chat-panel" role="dialog" aria-label="Chatbot">
           <div className="chat-header">
             <div>
-              <strong>{isDetail ? 'Trợ lý đọc bài' : 'Trợ lý tìm bài viết'}</strong>
-              <span>{isDetail ? 'Hỏi đáp & tóm tắt bài này' : 'Cho mình biết bạn cần tìm gì'}</span>
+              <strong>{isDetail ? 'Post reader assistant' : 'Post search assistant'}</strong>
+              <span>{isDetail ? 'Ask questions and summarize this post' : 'Tell me what you want to find'}</span>
             </div>
-            <button onClick={() => setOpen(false)} aria-label="Đóng">✕</button>
+            <button onClick={() => setOpen(false)} aria-label="Close">✕</button>
           </div>
 
           <div className="chat-body">
             {messages.length === 0 && (
               <div className="bubble assistant">
                 {isDetail
-                  ? 'Chào bạn! Mình có thể tóm tắt bài viết này hoặc trả lời câu hỏi về nội dung bài.'
-                  : 'Chào bạn! Hãy mô tả nội dung bạn muốn tìm, mình sẽ gợi ý các bài viết phù hợp.'}
+                  ? 'Hi there! I can summarize this article or answer questions about its content.'
+                  : 'Hi there! Describe what you want to find, and I will suggest relevant posts.'}
               </div>
             )}
 
@@ -99,13 +98,13 @@ const ChatWidget = () => {
               </div>
             ))}
 
-            {loading && <div className="bubble assistant typing">Đang trả lời...</div>}
+            {loading && <div className="bubble assistant typing">Responding...</div>}
             <div ref={bottomRef} />
           </div>
 
           {!user ? (
             <div className="chat-login">
-              <Link to="/login">Đăng nhập</Link> để dùng chatbot.
+              <Link to="/login">Log in</Link> to use the chatbot.
             </div>
           ) : (
             <>
@@ -120,17 +119,17 @@ const ChatWidget = () => {
                 <input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={isDetail ? 'Hỏi về bài viết...' : 'Bạn muốn tìm bài gì?'}
+                  placeholder={isDetail ? 'Ask about the post...' : 'What are you looking for?'}
                   maxLength={1000}
                 />
-                <button type="submit" disabled={loading || !input.trim()}>Gửi</button>
+                <button type="submit" disabled={loading || !input.trim()}>Send</button>
               </form>
             </>
           )}
         </div>
       )}
 
-      <button className="chat-fab" onClick={() => setOpen(!open)} aria-label="Mở chatbot">
+      <button className="chat-fab" onClick={() => setOpen(!open)} aria-label="Open chatbot">
         {open ? '✕' : <img src={chatIcon} alt="" />}
       </button>
     </>

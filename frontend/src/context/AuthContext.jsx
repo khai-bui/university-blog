@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
     saveAuth(res.data);
   };
 
-  // Đăng ký xong chưa đăng nhập, phải xác minh email bằng OTP trước
+  // After registration, the user must verify the email using OTP before using the app.
   const register = async (username, email, password) => {
     const res = await api.post('/auth/register', { username, email, password });
     return res.data;

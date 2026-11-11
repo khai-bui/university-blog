@@ -4,7 +4,7 @@ import { fetchPostById } from '../services/postService';
 
 const formatDate = (value) =>
   value
-    ? new Date(value).toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })
+    ? new Date(value).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })
     : '';
 
 const PostDetail = () => {
@@ -23,7 +23,7 @@ const PostDetail = () => {
         setPost(data);
         document.title = data.title;
       } catch {
-        setError('Không tìm thấy bài viết.');
+        setError('Post not found.');
       } finally {
         setLoading(false);
       }
@@ -32,11 +32,11 @@ const PostDetail = () => {
     window.scrollTo(0, 0);
   }, [id]);
 
-  if (loading) return <p className="state-msg">Đang tải bài viết...</p>;
+  if (loading) return <p className="state-msg">Loading post...</p>;
   if (error || !post) {
     return (
       <p className="state-msg error-msg">
-        {error} <Link to="/">Về trang chủ</Link>
+        {error} <Link to="/">Back to home</Link>
       </p>
     );
   }
@@ -47,7 +47,7 @@ const PostDetail = () => {
   const readMinutes = Math.max(1, Math.ceil(words / 180));
   const lead = content.length > 180 ? content.slice(0, 180).trim() + '...' : content;
   const tags = Array.from(post.tags || []);
-  const author = post.authorName || 'Ẩn danh';
+  const author = post.authorName || 'Anonymous';
   const url = encodeURIComponent(window.location.href);
 
   const copyLink = async () => {
@@ -56,7 +56,7 @@ const PostDetail = () => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      /* trình duyệt chặn clipboard: bỏ qua */
+      /* The browser blocked clipboard access; ignore this silently. */
     }
   };
 
@@ -67,14 +67,14 @@ const PostDetail = () => {
           <path d="M610 0 C 640 60, 600 150, 540 230" fill="none" stroke="#ff2a2a" strokeWidth="3" />
           <path d="M500 330 C 560 400, 700 420, 820 440" fill="none" stroke="#ff2a2a" strokeWidth="3" />
         </svg>
-        <span className="pill">Bài viết</span>
+        <span className="pill">Post</span>
         <h1>{post.title}</h1>
       </section>
 
       <div className="crumbs">
-        <Link to="/">Trang chủ</Link>
+        <Link to="/">Home</Link>
         <span className="sep">▸</span>
-        <Link to="/">Bài viết</Link>
+        <Link to="/">Posts</Link>
         <span className="sep">▸</span>
         <em>{post.title}</em>
       </div>
@@ -82,17 +82,17 @@ const PostDetail = () => {
       <section className="meta-band">
         <div className="meta-row">
           <div className="meta-item">
-            <b>Ngày đăng</b>
+            <b>Published date</b>
             <span>{formatDate(post.createdAt)}</span>
           </div>
           <div className="avatar">{author.charAt(0).toUpperCase()}</div>
           <div className="meta-item">
-            <b>Người viết</b>
+            <b>Author</b>
             <span>{author}</span>
           </div>
         </div>
         <p className="lead">{lead}</p>
-        <p className="readtime">Thời gian đọc: {readMinutes} phút</p>
+        <p className="readtime">Reading time: {readMinutes} minute{readMinutes > 1 ? 's' : ''}</p>
       </section>
 
       <div className="article-wrap">
@@ -101,7 +101,7 @@ const PostDetail = () => {
             href={`https://www.facebook.com/sharer/sharer.php?u=${url}`}
             target="_blank"
             rel="noreferrer"
-            aria-label="Chia sẻ Facebook"
+            aria-label="Share on Facebook"
           >
             f
           </a>
@@ -109,11 +109,11 @@ const PostDetail = () => {
             href={`https://twitter.com/intent/tweet?url=${url}`}
             target="_blank"
             rel="noreferrer"
-            aria-label="Chia sẻ X"
+            aria-label="Share on X"
           >
             X
           </a>
-          <button onClick={copyLink} aria-label="Sao chép liên kết" title="Sao chép liên kết">
+          <button onClick={copyLink} aria-label="Copy link" title="Copy link">
             {copied ? '✓' : '🔗'}
           </button>
         </div>

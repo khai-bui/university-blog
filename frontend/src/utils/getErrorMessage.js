@@ -4,6 +4,6 @@ export function getErrorMessage(err) {
     (typeof d === "string" && d) ||
     d?.message ||
     d?.error ||
-    (err.response ? "Có lỗi xảy ra, thử lại sau" : "Không kết nối được máy chủ")
+    (err.response ? "Something went wrong. Please try again later." : "Unable to connect to the server.")
   );
 }

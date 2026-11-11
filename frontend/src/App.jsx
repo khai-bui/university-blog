@@ -3,9 +3,15 @@ import Navbar from './components/Navbar';
 import PostList from './components/PostList';
 import PostDetail from './components/PostDetail';
 import ChatWidget from './components/ChatWidget';
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import VerifyOtp from "./pages/VerifyOtp";
+import ProtectedRoute from './components/ProtectedRoute';
+import RoleRoute from './components/RoleRoute';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import VerifyOtp from './pages/VerifyOtp';
+import CreatePost from './pages/CreatePost';
+import MyPosts from './pages/MyPost';
+import AdminPosts from './pages/admin/AdminPosts';
+import AdminUsers from './pages/admin/AdminUsers';
 
 function App() {
   return (
@@ -17,6 +23,10 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify" element={<VerifyOtp />} />
+        <Route path="/posts/new" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
+        <Route path="/my-posts" element={<ProtectedRoute><MyPosts /></ProtectedRoute>} />
+        <Route path="/admin/posts" element={<RoleRoute roles={["ROLE_ADMIN"]}><AdminPosts /></RoleRoute>} />
+        <Route path="/admin/users" element={<RoleRoute roles={["ROLE_ADMIN"]}><AdminUsers /></RoleRoute>} />
       </Routes>
       <ChatWidget />
     </>

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getErrorMessage } from "../utils/getErrorMessage";
 
-// Kiểm tra số phiên bản Graph API mới nhất trên Facebook for Developers và đổi tại đây
+// Check the latest Graph API version on Facebook for Developers and update it here if needed.
 const FB_VERSION = "v23.0";
 const ENABLE_FACEBOOK = import.meta.env.VITE_ENABLE_FACEBOOK === "true";
 
@@ -52,14 +52,14 @@ export default function SocialLogin({ note }) {
       await socialLogin(provider, token);
       navigate("/");
     } catch (err) {
-      console.error("Social login error:", err); 
+      console.error("Social login error:", err);
       setError(getErrorMessage(err));
     }
   };
 
   const googleLogin = useGoogleLogin({
     onSuccess: (r) => finish("google", r.access_token),
-    onError: () => setError("Đăng nhập Google thất bại"),
+    onError: () => setError("Google login failed"),
   });
 
   const onFacebook = async () => {
@@ -68,7 +68,7 @@ export default function SocialLogin({ note }) {
     FB.login(
       (res) => {
         if (res.authResponse?.accessToken) finish("facebook", res.authResponse.accessToken);
-        else setError("Bạn đã hủy đăng nhập Facebook");
+        else setError("You cancelled Facebook login");
       },
       { scope: "public_profile,email" }
     );
@@ -77,16 +77,16 @@ export default function SocialLogin({ note }) {
   return (
     <div className="social">
       <button type="button" className="social-btn google" onClick={() => { setError(""); googleLogin(); }}>
-        <GoogleIcon /> Tiếp tục với Google
+        <GoogleIcon /> Continue with Google
       </button>
       {ENABLE_FACEBOOK && (
-      <button type="button" className="social-btn facebook" onClick={onFacebook}>
-        <FacebookIcon /> Tiếp tục với Facebook
+        <button type="button" className="social-btn facebook" onClick={onFacebook}>
+          <FacebookIcon /> Continue with Facebook
         </button>
       )}
       {note && <p className="social-note">{note}</p>}
       {error && <div className="auth-error" role="alert">{error}</div>}
-      <div className="auth-divider"><span>hoặc</span></div>
+      <div className="auth-divider"><span>or</span></div>
     </div>
   );
 }
