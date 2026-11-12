@@ -3,10 +3,12 @@ package com.khai.buiminh05.university_blog.service;
 import com.khai.buiminh05.university_blog.dto.ai.GeminiRequest;
 import com.khai.buiminh05.university_blog.dto.ai.GeminiResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 
@@ -24,38 +26,48 @@ public class AIService {
     public AIService() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(Duration.ofSeconds(5));
-        factory.setReadTimeout(Duration.ofSeconds(15));
-        this.restClient = RestClient.builder()
-                .requestFactory(factory)
-                .build();
+        factory.setReadTimeout(Duration.ofSeconds(120));
+        this.restClient = RestClient.builder().requestFactory(factory).build();
+    }
+
+    /** Send a prompt and return the text. Throws ResponseStatusException if the AI request fails. */
+    public String generate(String prompt) {
+        try {
+            GeminiResponse response = restClient.post()
+                    .uri(apiUrl.trim() + "?key=" + apiKey.trim())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(GeminiRequest.createPrompt(prompt))
+                    .retrieve()
+                    .body(GeminiResponse.class);
+
+            String text = response != null ? response.extractResponseText() : null;
+            if (text == null || text.isBlank()) {
+                throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "The AI returned no content");
+            }
+            return text.trim();
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "The AI is currently unavailable. Please try again later.");
+        }
     }
 
     public String summarizePostContent(String content) {
         String prompt = """
-        Summarize the following university blog post for students.
-        Rules:
-        - Write the summary based on its language
-        - Use as many bullet points as the content needs: 2-3 for short posts, up to 6 for long ones. Do not pad.
-        - Put each bullet on its own line, starting with "- ".
-        - Keep each bullet short (under 25 words) and include key facts such as dates, deadlines, and numbers.
-        - Plain text only: no markdown formatting (no **, no #), no introduction, no closing remarks.
+                Summarize the following university blog post for students.
+                Rules:
+                - Write the summary in based on the post language.
+                - Use as many bullet points as the content needs: 2-3 for short posts, up to 6 for long ones. Do not pad.
+                - Put each bullet on its own line, starting with "- ".
+                - Keep each bullet short (under 25 words) and include key facts such as dates, deadlines, and numbers.
+                - Plain text only: no markdown formatting (no **, no #), no introduction, no closing remarks.
 
-        Blog post:
-        """ + content;
-
-        GeminiRequest requestBody = GeminiRequest.createPrompt(prompt);
-
+                Blog post:
+                """ + content;
         try {
-            GeminiResponse response = restClient.post()
-                    .uri(apiUrl + "?key=" + apiKey)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(requestBody)
-                    .retrieve()
-                    .body(GeminiResponse.class);
-
-            return response != null ? response.extractResponseText() : "Failed to obtain summary from AI.";
-        } catch (Exception e) {
-            return "AI Summarization is currently unavailable. Error: " + e.getMessage();
+            return generate(prompt);
+        } catch (ResponseStatusException e) {
+            return "AI Summarization is currently unavailable. Error: " + e.getReason();
         }
     }
 }

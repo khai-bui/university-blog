@@ -1,4 +1,5 @@
 package com.khai.buiminh05.university_blog.entity;
 
-public class PostStatus {
+public enum PostStatus {
+    PENDING, APPROVED, REJECTED
 }

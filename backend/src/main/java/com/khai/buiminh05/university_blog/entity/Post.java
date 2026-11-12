@@ -28,6 +28,12 @@ public class Post {
     @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String content;
 
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
+
+    @Column(name = "image_alt", length = 300)
+    private String imageAlt;
+
     @Column(name = "ai_summary", columnDefinition = "TEXT")
     private String aiSummary;
 
@@ -51,4 +57,11 @@ public class Post {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private PostStatus status = PostStatus.PENDING;
+
+    @Column(length = 500)
+    private String rejectReason;
 }

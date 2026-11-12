@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,12 +20,6 @@ public class PostController {
 
     private final PostService postService;
 
-    @PostMapping
-    public ResponseEntity<PostResponse> createPost(@Valid @RequestBody CreatePostRequest request) {
-        PostResponse response = postService.createPost(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
     @GetMapping
     public ResponseEntity<List<PostResponse>> getAllPosts() {
         List<PostResponse> posts = postService.getAllPosts();
@@ -36,5 +31,10 @@ public class PostController {
     public ResponseEntity<PostResponse> summarizePost(@PathVariable Long id) {
         PostResponse response = postService.generateAndSaveSummary(id);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PostResponse> getPostById(@PathVariable Long id, Authentication auth) {
+        return ResponseEntity.ok(postService.getPostById(id, auth));
     }
 }

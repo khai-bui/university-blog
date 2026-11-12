@@ -13,6 +13,8 @@ public class PostResponse {
     private Long id;
     private String title;
     private String content;
+    private String imageUrl;
+    private String imageAlt;
     private String aiSummary;
     private String authorName;
     private Set<String> tags;

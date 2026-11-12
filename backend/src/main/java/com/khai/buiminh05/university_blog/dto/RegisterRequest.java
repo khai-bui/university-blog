@@ -1,3 +1,5 @@
+package com.khai.buiminh05.university_blog.dto;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

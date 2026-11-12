@@ -28,9 +28,16 @@ public class User {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
+    @Column(name = "email_verified", nullable = false)
+    private boolean emailVerified = true;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @Builder.Default
+    @Column(nullable = false, columnDefinition = "BOOLEAN NOT NULL DEFAULT TRUE")
+    private boolean active = true;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

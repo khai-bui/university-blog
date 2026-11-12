@@ -11,8 +11,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import com.khai.buiminh05.university_blog.dto.RegisterRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +28,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     // Student
     @Transactional
-    public User registerUser(UserController.RegisterRequest request) {
+    public User registerUser(RegisterRequest request) {
         if (userRepository.existsByUsername(request.username())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken");
         }
@@ -81,5 +87,56 @@ public class UserService {
                 .role(user.getRole())
                 .createdAt(user.getCreatedAt())
                 .build();
+    }
+
+    public User findOrCreateSocialUser(String email, String name) {
+        Optional<User> existing = userRepository.findByEmail(email);
+
+        // Case 1: this email already has an account
+        if (existing.isPresent()) {
+            User u = existing.get();
+            if (!u.isActive()) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "This account has been deactivated");
+            }
+            if (!u.isEmailVerified()) {
+                u.setEmailVerified(true);
+                u.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+                return userRepository.save(u);
+            }
+            return u;
+        }
+
+        // Case 2: no account exists yet; create one from the Google profile
+        String base = email.substring(0, email.indexOf('@'));
+        String username = base;
+        int i = 1;
+        while (userRepository.existsByUsername(username)) {
+            username = base + i++;
+        }
+
+        User u = new User();
+        u.setUsername(username);
+        u.setEmail(email);
+        u.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+        u.setRole(User.Role.ROLE_STUDENT);
+        u.setEmailVerified(true);          // Google has already verified this email
+        return userRepository.save(u);
+    }
+
+    public User createVerifiedUser(String username, String email, String passwordHash) {
+        if (userRepository.existsByUsername(username))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already in use");
+        if (userRepository.findByEmail(email).isPresent())
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
+
+        User u = new User();
+        u.setUsername(username);
+        u.setEmail(email);
+        u.setPassword(passwordHash);          // Already hashed during registration; do not hash it again
+        u.setRole(User.Role.ROLE_STUDENT);
+        u.setEmailVerified(true);
+        // If registerUser assigns any other fields (such as the creation date), assign them here too
+        return userRepository.save(u);
     }
 }
