@@ -1,5 +1,6 @@
 import { createElement, useMemo } from "react";
 import { getImageUrl } from "../utils/getImageUrl";
+import { normalizeHtmlContent } from "../utils/normalizeHtmlContent";
 
 const ALLOWED_TAGS = new Set([
   "a", "b", "blockquote", "br", "div", "em", "h2", "h3",
@@ -40,11 +41,13 @@ function renderNode(node, key) {
 }
 
 export default function PostContent({ content }) {
+  const normalizedContent = useMemo(() => normalizeHtmlContent(content), [content]);
+
   const rendered = useMemo(() => {
-    const documentNode = new DOMParser().parseFromString(content || "", "text/html");
+    const documentNode = new DOMParser().parseFromString(normalizedContent || "", "text/html");
     return Array.from(documentNode.body.childNodes).map((node, index) =>
       renderNode(node, `content-${index}`));
-  }, [content]);
+  }, [normalizedContent]);
 
   return <div className="post-content">{rendered}</div>;
 }

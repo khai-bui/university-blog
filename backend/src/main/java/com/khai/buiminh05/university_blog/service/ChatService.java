@@ -3,12 +3,14 @@ package com.khai.buiminh05.university_blog.service;
 import com.khai.buiminh05.university_blog.dto.ChatRequest;
 import com.khai.buiminh05.university_blog.dto.ChatResponse;
 import com.khai.buiminh05.university_blog.entity.Post;
+import com.khai.buiminh05.university_blog.entity.PostStatus;
 import com.khai.buiminh05.university_blog.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -61,12 +63,19 @@ public class ChatService {
 
     // ---------- Home page: find posts based on the user's needs ----------
     private ChatResponse searchPosts(ChatRequest req) {
-        List<Post> posts = postRepository.findAll().stream()
+        Set<Long> excludedPostIds = req.excludePostIds() == null
+                ? Set.of()
+                : new HashSet<>(req.excludePostIds());
+        List<Post> posts = postRepository.findByStatusOrderByCreatedAtDesc(PostStatus.APPROVED).stream()
+                .filter(post -> !excludedPostIds.contains(post.getId()))
                 .limit(MAX_CATALOG_POSTS)
                 .toList();
 
         if (posts.isEmpty()) {
-            return new ChatResponse("There are currently no posts in the system.", List.of());
+            String reply = excludedPostIds.isEmpty()
+                    ? "There are currently no published posts to recommend."
+                    : "I've already recommended all available posts in this chat. Try asking about a different topic.";
+            return new ChatResponse(reply, List.of());
         }
 
         Map<Long, Post> byId = posts.stream().collect(Collectors.toMap(Post::getId, p -> p, (a, b) -> a));
@@ -77,6 +86,8 @@ public class ChatService {
             if (snippet.length() > 150) snippet = snippet.substring(0, 150) + "...";
             catalog.append("[id=").append(p.getId()).append("] ")
                     .append(p.getTitle())
+                    .append(" | post date: ")
+                    .append(p.getCreatedAt() == null ? "date unavailable" : p.getCreatedAt().toLocalDate())
                     .append(" | tags: ").append(p.getTags() == null ? "" : p.getTags())
                     .append(" | ").append(snippet)
                     .append("\n");
@@ -85,6 +96,15 @@ public class ChatService {
         String prompt = """
                 You help students find posts on a university blog. The post catalog is below.
                 Pick up to 5 posts that best match the user's need.
+                Today's date is %s.
+                Use each post's published date when making recommendations:
+                - If the user asks for the latest, newest, recent, upcoming, or time-sensitive information,
+                  prioritize the most recently published relevant posts and explain the date context.
+                  For "latest announcements", choose the newest relevant posts first.
+                - For other requests, prioritize relevance first and use recency to break close matches.
+                Never recommend a post that is missing from the catalog.
+                - Never describe an old post as upcoming or current unless its content and date support that.
+                - Do not invent dates, deadlines, or facts that are not in the catalog.
                 Reply in English with 1-2 short sentences explaining the choice. Plain text, no markdown.
                 On the LAST line write exactly: IDS: followed by the chosen post ids separated by commas
                 (example: IDS: 3,7). If nothing matches write: IDS: NONE
@@ -97,7 +117,7 @@ public class ChatService {
                 %s
 
                 User need: %s
-                """.formatted(catalog, formatHistory(req.history()), req.message());
+                """.formatted(LocalDate.now(), catalog, formatHistory(req.history()), req.message());
 
         String raw = aiService.generate(prompt);
 

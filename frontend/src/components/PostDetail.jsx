@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { fetchPostById } from '../services/postService';
 import { getImageUrl } from '../utils/getImageUrl';
+import { normalizeHtmlContent, stripHtmlTags } from '../utils/normalizeHtmlContent';
 import PostContent from './PostContent';
+import CommentsSection from './CommentsSection';
 
 const formatDate = (value) =>
   value
@@ -43,10 +45,11 @@ const PostDetail = () => {
     );
   }
 
-  const content = post.content || '';
-  const words = content.trim().split(/\s+/).filter(Boolean).length;
+  const content = normalizeHtmlContent(post.content || '');
+  const plainTextContent = stripHtmlTags(content);
+  const words = plainTextContent ? plainTextContent.split(/\s+/).filter(Boolean).length : 0;
   const readMinutes = Math.max(1, Math.ceil(words / 180));
-  const lead = content.length > 180 ? content.slice(0, 180).trim() + '...' : content;
+  const lead = plainTextContent.length > 180 ? plainTextContent.slice(0, 180).trim() + '...' : plainTextContent;
   const tags = Array.from(post.tags || []);
   const author = post.authorName || 'Anonymous';
   const url = encodeURIComponent(window.location.href);
@@ -103,27 +106,6 @@ const PostDetail = () => {
       )}
 
       <div className="article-wrap">
-        <div className="share-rail">
-          <a
-            href={`https://www.facebook.com/sharer/sharer.php?u=${url}`}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Share on Facebook"
-          >
-            f
-          </a>
-          <a
-            href={`https://twitter.com/intent/tweet?url=${url}`}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Share on X"
-          >
-            X
-          </a>
-          <button onClick={copyLink} aria-label="Copy link" title="Copy link">
-            {copied ? '✓' : '🔗'}
-          </button>
-        </div>
 
         <article className="article-body">
           <PostContent content={content} />
@@ -137,6 +119,7 @@ const PostDetail = () => {
           )}
         </article>
       </div>
+      <CommentsSection postId={post.id} />
     </>
   );
 };

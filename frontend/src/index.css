@@ -335,6 +335,19 @@ a.card-cover { display: block; }
 a.link-btn { text-decoration: none; }
 a.link-btn:hover { text-decoration: underline; }
 
+.comments-section { width: min(100% - 32px, 820px); margin: 32px auto 64px; }
+.comments-section h2 { color: var(--brand, #0b2a5b); }
+.comment-form { display: grid; gap: 10px; padding: 18px; background: #fff; border: 1px solid #e4e9f1; border-radius: 12px; }
+.comment-form label { font-weight: 600; color: #2b3445; }
+.comment-form textarea { width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid #cfd6e3; border-radius: 8px; resize: vertical; font: inherit; }
+.comment-form-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.comment-list { display: grid; gap: 12px; margin-top: 20px; }
+.comment-card { padding: 16px 18px; background: #fff; border: 1px solid #e4e9f1; border-radius: 10px; }
+.comment-header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; color: #2b3445; }
+.comment-header time { color: #697386; font-size: 0.875rem; }
+.comment-card p { margin: 12px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.comment-delete { color: #b42318; }
+
 /* ---------- Trang chi tiết ---------- */
 .detail-hero { padding-bottom: 80px; }
 .pill {

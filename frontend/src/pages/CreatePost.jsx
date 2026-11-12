@@ -347,10 +347,6 @@ export default function CreatePost({ editMode = false }) {
             onPaste={onContentPaste}
           />
           <div className="editor-actions">
-            <button type="button" className="btn image-insert" onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => inlineImageInput.current?.click()}>
-              Add image in content
-            </button>
             <input
               ref={inlineImageInput}
               className="visually-hidden"
@@ -360,7 +356,6 @@ export default function CreatePost({ editMode = false }) {
               tabIndex={-1}
               aria-hidden="true"
             />
-            <span className="muted image-help">Paste an image here or choose a file (max 5 MB each).</span>
           </div>
         </div>
         <div className="image-picker">

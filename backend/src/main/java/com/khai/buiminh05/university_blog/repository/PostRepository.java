@@ -18,6 +18,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findByStatusOrderByIdDesc(PostStatus status);
 
+    List<Post> findByStatusOrderByCreatedAtDesc(PostStatus status);
+
     List<Post> findByAuthorOrderByIdDesc(User author);
 
     List<Post> findByTags_Id(Long tagId);
