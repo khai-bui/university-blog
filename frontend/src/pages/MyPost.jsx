@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { getMyPosts } from "../services/submissionService";
+import { deletePost, getMyPosts } from "../services/submissionService";
 import { getErrorMessage } from "../utils/getErrorMessage";
 import { getImageUrl } from "../utils/getImageUrl";
 import "./ui.css";
@@ -12,6 +12,7 @@ export default function MyPosts() {
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     getMyPosts()
@@ -19,6 +20,20 @@ export default function MyPosts() {
       .catch((e) => setError(getErrorMessage(e)))
       .finally(() => setLoading(false));
   }, []);
+
+  const onDelete = async (post) => {
+    if (!window.confirm(`Delete "${post.title}"? This cannot be undone.`)) return;
+    setError("");
+    setDeletingId(post.id);
+    try {
+      await deletePost(post.id);
+      setPosts((current) => current.filter((item) => item.id !== post.id));
+    } catch (e) {
+      setError(getErrorMessage(e));
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <div className="page">
@@ -28,6 +43,9 @@ export default function MyPosts() {
       </div>
       {state?.justSubmitted && (
         <div className="alert info">Your post has been submitted. It will appear after an administrator approves it.</div>
+      )}
+      {state?.justUpdated && (
+        <div className="alert info">Your changes have been submitted for administrator approval.</div>
       )}
       {error && <div className="alert error">{error}</div>}
       {loading && <p className="muted">Loading...</p>}
@@ -44,6 +62,16 @@ export default function MyPosts() {
           {p.status === "REJECTED" && p.rejectReason && (
             <p className="muted">Reason: {p.rejectReason}</p>
           )}
+          <div className="actions">
+            <Link to={`/posts/${p.id}/edit`} className="btn primary">Edit</Link>
+            <button
+              className="btn danger"
+              onClick={() => onDelete(p)}
+              disabled={deletingId === p.id}
+            >
+              {deletingId === p.id ? "Deleting..." : "Delete"}
+            </button>
+          </div>
         </div>
       ))}
     </div>

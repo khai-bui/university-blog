@@ -10,6 +10,14 @@
   padding: 10px 12px; border: 1px solid #cfd6e3; border-radius: 8px; font: inherit; width: 100%; box-sizing: border-box;
 }
 .form input[type="file"] { background: #fff; }
+.tag-picker { border: 0; padding: 0; margin: 0; display: grid; gap: 8px; }
+.tag-picker legend { font-weight: 600; color: #2b3445; padding: 0; }
+.tag-options { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.form .tag-option { display: flex; align-items: center; gap: 6px; font-weight: 400; }
+.form .tag-option input { width: auto; margin: 0; }
+.tag-picker p { margin: 0; }
+.tag-admin-list { display: grid; gap: 10px; }
+.tag-admin-item { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .content-field { display: grid; gap: 6px; }
 .content-field > label { font-weight: 600; color: #2b3445; }
 .content-editor { min-height: 260px; padding: 12px; border: 1px solid #cfd6e3; border-radius: 8px; font: inherit; font-weight: 400; white-space: pre-wrap; overflow-wrap: anywhere; }

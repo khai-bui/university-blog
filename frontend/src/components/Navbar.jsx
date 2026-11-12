@@ -29,6 +29,7 @@ const Navbar = () => {
               <>
                 <Link to="/admin/posts">Review posts</Link>
                 <Link to="/admin/users">Users</Link>
+                <Link to="/admin/tags">Tags</Link>
               </>
             )}
             <span>Welcome, <strong>{user.username}</strong></span>

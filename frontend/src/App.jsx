@@ -12,6 +12,7 @@ import CreatePost from './pages/CreatePost';
 import MyPosts from './pages/MyPost';
 import AdminPosts from './pages/admin/AdminPosts';
 import AdminUsers from './pages/admin/AdminUsers';
+import AdminTags from './pages/admin/AdminTags';
 
 function App() {
   return (
@@ -24,9 +25,11 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/verify" element={<VerifyOtp />} />
         <Route path="/posts/new" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
+        <Route path="/posts/:id/edit" element={<ProtectedRoute><CreatePost editMode /></ProtectedRoute>} />
         <Route path="/my-posts" element={<ProtectedRoute><MyPosts /></ProtectedRoute>} />
         <Route path="/admin/posts" element={<RoleRoute roles={["ROLE_ADMIN"]}><AdminPosts /></RoleRoute>} />
         <Route path="/admin/users" element={<RoleRoute roles={["ROLE_ADMIN"]}><AdminUsers /></RoleRoute>} />
+        <Route path="/admin/tags" element={<RoleRoute roles={["ROLE_ADMIN"]}><AdminTags /></RoleRoute>} />
       </Routes>
       <ChatWidget />
     </>

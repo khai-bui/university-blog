@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { getUsers, changeRole } from "../../services/adminService";
+import { getUsers, changeRole, setUserActive } from "../../services/adminService";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import "../ui.css";
 
@@ -34,6 +34,19 @@ export default function AdminUsers() {
     }
   };
 
+  const onToggleActive = async (u) => {
+    const active = !u.active;
+    const action = active ? "Reactivate" : "Deactivate";
+    if (!window.confirm(`${action} the account for ${u.username}?`)) return;
+    setError("");
+    try {
+      const updated = await setUserActive(u.id, active);
+      setUsers((list) => list.map((x) => (x.id === u.id ? updated : x)));
+    } catch (e) {
+      setError(getErrorMessage(e));
+    }
+  };
+
   const shown = users.filter((u) =>
     (u.username + " " + u.email).toLowerCase().includes(query.toLowerCase())
   );
@@ -48,7 +61,7 @@ export default function AdminUsers() {
       <div className="card table-wrap">
         <table>
           <thead>
-            <tr><th>Username</th><th>Email</th><th>Role</th></tr>
+            <tr><th>Username</th><th>Email</th><th>Role</th><th>Account</th><th>Action</th></tr>
           </thead>
           <tbody>
             {shown.map((u) => {
@@ -65,6 +78,17 @@ export default function AdminUsers() {
                         <option value="ROLE_STUDENT">Student</option>
                         <option value="ROLE_TEACHER">Teacher</option>
                       </select>
+                    )}
+                  </td>
+                  <td><span className={`badge ${u.active ? "approved" : "rejected"}`}>{u.active ? "Active" : "Deactivated"}</span></td>
+                  <td>
+                    {!locked && (
+                      <button
+                        className={`btn ${u.active ? "danger" : "primary"}`}
+                        onClick={() => onToggleActive(u)}
+                      >
+                        {u.active ? "Deactivate" : "Reactivate"}
+                      </button>
                     )}
                   </td>
                 </tr>

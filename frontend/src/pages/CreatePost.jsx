@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { createPost } from "../services/submissionService";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { createPost, getPostForEdit, updatePost } from "../services/submissionService";
+import { getTags } from "../services/tagService";
 import { getErrorMessage } from "../utils/getErrorMessage";
+import { getImageUrl } from "../utils/getImageUrl";
 import "./ui.css";
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
@@ -58,19 +60,62 @@ function embedImageUrls(root) {
   });
 }
 
-export default function CreatePost() {
+export default function CreatePost({ editMode = false }) {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const editing = editMode && Boolean(id);
   const [form, setForm] = useState({ title: "", content: "" });
   const [image, setImage] = useState(null);
   const [imageAlt, setImageAlt] = useState("");
   const [imagePreview, setImagePreview] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [tags, setTags] = useState([]);
+  const [selectedTagIds, setSelectedTagIds] = useState([]);
+  const [tagsLoading, setTagsLoading] = useState(true);
+  const [tagsError, setTagsError] = useState("");
+  const [postLoading, setPostLoading] = useState(editing);
+  const [postError, setPostError] = useState("");
+  const [existingImageUrl, setExistingImageUrl] = useState("");
+  const [existingPost, setExistingPost] = useState(null);
   const imageInput = useRef(null);
   const inlineImageInput = useRef(null);
   const contentEditor = useRef(null);
   const inlineImageUrls = useRef(new Set());
   const [inlineImages, setInlineImages] = useState({});
+
+  const loadTags = useCallback(() => {
+    setTagsLoading(true);
+    setTagsError("");
+    getTags()
+      .then(setTags)
+      .catch((e) => setTagsError(getErrorMessage(e)))
+      .finally(() => setTagsLoading(false));
+  }, []);
+
+  useEffect(() => {
+    loadTags();
+  }, [loadTags]);
+
+  useEffect(() => {
+    if (!editing) return;
+    getPostForEdit(id)
+      .then((post) => {
+        setExistingPost(post);
+        setForm({ title: post.title, content: post.content });
+        setImageAlt(post.imageAlt || "");
+        setExistingImageUrl(post.imageUrl || "");
+        setSelectedTagIds(post.tagIds || []);
+      })
+      .catch((e) => setPostError(getErrorMessage(e)))
+      .finally(() => setPostLoading(false));
+  }, [editing, id]);
+
+  useEffect(() => {
+    if (existingPost && contentEditor.current) {
+      contentEditor.current.innerHTML = existingPost.content;
+    }
+  }, [existingPost]);
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -217,17 +262,20 @@ export default function CreatePost() {
         inlineImage.removeAttribute("class");
       });
 
-      await createPost({
+      const postData = {
         title: form.title.trim(),
         content: contentNode.innerHTML.trim(),
         image,
         imageAlt: imageAlt.trim(),
+        tagIds: selectedTagIds,
         inlineImages: [...new Set(referencedTokens)].map((token) => ({
           token,
           file: inlineImages[token].file,
         })),
-      });
-      navigate("/my-posts", { state: { justSubmitted: true } });
+      };
+      if (editing) await updatePost(id, postData);
+      else await createPost(postData);
+      navigate("/my-posts", { state: { justSubmitted: !editing, justUpdated: editing } });
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {
@@ -237,13 +285,50 @@ export default function CreatePost() {
 
   return (
     <div className="page">
-      <h1>Create a new post</h1>
-      <p className="muted">Your post will be sent to an administrator for review before being published.</p>
+      <h1>{editing ? "Edit post" : "Create a new post"}</h1>
+      <p className="muted">
+        {editing
+          ? "Your changes will be sent to an administrator for approval. The post will be hidden until approved."
+          : "Your post will be sent to an administrator for review before being published."}
+      </p>
+      {postLoading && <p className="muted">Loading post...</p>}
+      {postError && <div className="alert error">{postError}</div>}
+      {!postLoading && !postError && (
       <form onSubmit={onSubmit} className="card form">
         <label>
           <span>Title</span>
           <input name="title" value={form.title} onChange={onChange} maxLength={200} required />
         </label>
+        <fieldset className="tag-picker">
+          <legend>Post tags</legend>
+          {tagsLoading && <p className="muted">Loading available tags...</p>}
+          {tagsError && (
+            <div className="alert error">
+              Could not load tags: {tagsError} <button type="button" className="link" onClick={loadTags}>Try again</button>
+            </div>
+          )}
+          {!tagsLoading && !tagsError && tags.length === 0 && (
+            <p className="muted">No tags are available yet.</p>
+          )}
+          {!tagsLoading && !tagsError && tags.length > 0 && (
+            <div className="tag-options">
+              {tags.map((tag) => (
+                <label key={tag.id} className="tag-option">
+                  <input
+                    type="checkbox"
+                    checked={selectedTagIds.includes(tag.id)}
+                    onChange={(e) => setSelectedTagIds((current) => (
+                      e.target.checked
+                        ? [...current, tag.id]
+                        : current.filter((id) => id !== tag.id)
+                    ))}
+                  />
+                  {tag.name}
+                </label>
+              ))}
+            </div>
+          )}
+        </fieldset>
         <div className="content-field">
           <label htmlFor="post-content">Content</label>
           <div
@@ -289,9 +374,15 @@ export default function CreatePost() {
             />
           </label>
           <p className="muted image-help">JPEG, PNG, GIF, or WebP; maximum 5 MB.</p>
-          {image && (
+          {(image || existingImageUrl) && (
             <>
-              {imagePreview && <img className="image-preview" src={imagePreview} alt="Selected cover preview" />}
+              {(imagePreview || existingImageUrl) && (
+                <img
+                  className="image-preview"
+                  src={imagePreview || getImageUrl(existingImageUrl)}
+                  alt={image ? "Selected cover preview" : imageAlt || form.title}
+                />
+              )}
               <label>
                 <span>Image description</span>
                 <input
@@ -301,17 +392,20 @@ export default function CreatePost() {
                   placeholder="Describe the image for readers using screen readers"
                 />
               </label>
-              <button type="button" className="btn danger image-remove" onClick={removeImage}>
-                Remove image
-              </button>
+              {image && (
+                <button type="button" className="btn danger image-remove" onClick={removeImage}>
+                  Remove selected image
+                </button>
+              )}
             </>
           )}
         </div>
         {error && <div className="alert error">{error}</div>}
-        <button className="btn primary" disabled={loading}>
-          {loading ? "Submitting..." : "Submit for review"}
+        <button className="btn primary" disabled={loading || tagsLoading || !!tagsError}>
+          {loading ? (editing ? "Saving..." : "Submitting...") : tagsLoading ? "Loading tags..." : editing ? "Save and send for approval" : "Submit for review"}
         </button>
       </form>
+      )}
     </div>
   );
 }

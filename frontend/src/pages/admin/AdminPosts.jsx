@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAdminPosts, approvePost, rejectPost } from "../../services/adminService";
+import { getAdminPosts, approvePost, rejectPost, deleteAdminPost } from "../../services/adminService";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import { getImageUrl } from "../../utils/getImageUrl";
 import PostContent from "../../components/PostContent";
@@ -43,6 +43,17 @@ export default function AdminPosts() {
     catch (e) { setError(getErrorMessage(e)); }
   };
 
+  const onDelete = async (post) => {
+    if (!window.confirm(`Delete "${post.title}" permanently?`)) return;
+    setError("");
+    try {
+      await deleteAdminPost(post.id);
+      removeFromList(post.id);
+    } catch (e) {
+      setError(getErrorMessage(e));
+    }
+  };
+
   return (
     <div className="page">
       <h1>Review posts</h1>
@@ -84,6 +95,7 @@ export default function AdminPosts() {
             {p.status !== "REJECTED" && (
               <button className="btn danger" onClick={() => onReject(p.id)}>Reject</button>
             )}
+            <button className="btn danger" onClick={() => onDelete(p)}>Delete</button>
           </div>
         </div>
       ))}
